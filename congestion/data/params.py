@@ -1,7 +1,10 @@
 import os
 
 LTA_API_HEADERS = {'AccountKey' : os.environ["LTA_ACCOUNT_KEY"]}
-LOCAL_DATA_PATH = os.path.expanduser(os.environ.get("LOCAL_DATA_PATH"))
+LOCAL_DATA_PATH = os.path.expanduser(os.environ["LOCAL_DATA_PATH"])
+
+PROJECT = os.environ["PROJECT"]
+DATASET = os.environ["SPEEDS_DATASET"]
 
 # TODO: Validations
 # ################## VALIDATIONS #################

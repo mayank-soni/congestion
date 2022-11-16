@@ -1,40 +1,45 @@
 import pandas as pd
-from congestion.data.get_data import get_images, get_speeds
+import os
 from google.cloud import bigquery
+from congestion.data.params import PROJECT, DATASET, LOCAL_DATA_PATH
+from congestion.data.get_data import get_images, get_speeds
+
+def save_cloud():
+    '''
+    Wrapper function, downloading image and speed data and saving on cloud
+    '''
+    # images = get_images()
+    # save_images_cloud(images)
+    # speedsdf = get_speeds()
+    speedsdf = pd.read_csv(os.path.join(LOCAL_DATA_PATH, 'data-speeds', 'speeds.csv'))
+    save_speeds_cloud(speedsdf)
 
 
-def save_local():
+def save_images_cloud(images: dict, verbose: bool = False):
     '''
-    Wrapper function, downloading image and speeds data and saving locally
+    Saves images to cloud.
     '''
-    images = get_images()
-    save_images_local(images)
-    # Download speeds data as .csv
-    current_time, speedsdf = get_speeds()
-    save_speeds_local(current_time, speedsdf)
+    pass # TODO
+    # print('Saving images to cloud')
+    # for i, (filename, data) in enumerate(images.items()):
+    #     if verbose:
+    #         print(f'Saving image {i}')
+    #     full_filename = os.path.join(LOCAL_DATA_PATH, 'data-images', filename)
+    #     with open(full_filename, 'wb') as f:
+    #         f.write(data)
 
 
-def save_images_local(images: dict, verbose: bool = False):
+def save_speeds_cloud(speedsdf: pd.DataFrame):
     '''
-    Saves images to local disk.
+    Saves speeds dataframe to cloud
     '''
-    print('Saving images to local disk')
-    for i, (filename, data) in enumerate(images.items()):
-        if verbose:
-            print(f'Saving image {i}')
-        full_filename = os.path.join(LOCAL_DATA_PATH, 'data-images', filename)
-        with open(full_filename, 'wb') as f:
-            f.write(data)
+    print('Saving speeds df to BigQuery')
 
-
-def save_speeds_local(current_time: str, speeds_data: pd.DataFrame):
-    '''
-    Saves speeds dataframe to local disk
-    '''
-    print('Saving speeds df to local disk')
-    filename = os.path.join(LOCAL_DATA_PATH, 'data-speeds', current_time + '_speed.csv')
-    speeds_data.to_csv(filename)
+    table = f"{PROJECT}.{DATASET}.speeds"
+    client = bigquery.Client()
+    job_config = bigquery.LoadJobConfig(autodetect=True)
+    client.load_table_from_dataframe(speedsdf, table, job_config = job_config)
 
 
 if __name__ == '__main__':
-    save_local()
+    save_cloud()

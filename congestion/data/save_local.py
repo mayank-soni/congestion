@@ -9,9 +9,8 @@ def save_local():
     '''
     images = get_images()
     save_images_local(images)
-    # Download speeds data as .csv
-    current_time, speedsdf = get_speeds()
-    save_speeds_local(current_time, speedsdf)
+    speedsdf = get_speeds()
+    save_speeds_local(speedsdf)
 
 
 def save_images_local(images: dict, verbose: bool = False):
@@ -27,13 +26,17 @@ def save_images_local(images: dict, verbose: bool = False):
             f.write(data)
 
 
-def save_speeds_local(current_time: str, speeds_data: pd.DataFrame):
+def save_speeds_local(speeds_data: pd.DataFrame):
     '''
     Saves speeds dataframe to local disk
     '''
     print('Saving speeds df to local disk')
-    filename = os.path.join(LOCAL_DATA_PATH, 'data-speeds', current_time + '_speed.csv')
-    speeds_data.to_csv(filename)
+    filename = os.path.join(LOCAL_DATA_PATH, 'data-speeds', 'speeds.csv')
+    # Write header to file if it is new, otherwise, no header
+    if os.path.exists(filename):
+        speeds_data.to_csv(filename, mode = 'a', header = False)
+    else:
+        speeds_data.to_csv(filename, mode = 'a', header = True)
 
 
 if __name__ == '__main__':
