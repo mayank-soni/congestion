@@ -96,5 +96,5 @@ def get_speed_chunk(skip: int = 0, verbose: bool = False) -> pd.DataFrame:
     # Add new timestamp column to timestamp data
     speeds_df['Time'] = current_time
     # Edit column data types
-    speeds_df.loc[:,['MinimumSpeed', 'MaximumSpeed']] = speeds_df[['MinimumSpeed', 'MaximumSpeed']].apply(pd.to_numeric)
+    speeds_df.loc[:,['MinimumSpeed', 'MaximumSpeed']] = speeds_df[['MinimumSpeed', 'MaximumSpeed']].apply(pd.to_numeric, downcast = 'float')
     return speeds_df
