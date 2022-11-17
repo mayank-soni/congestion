@@ -43,7 +43,5 @@ def save_speeds_cloud():
 
 
 if __name__ == '__main__':
-    if sys.argv[1] == 'images':
-        save_images_cloud()
-    if sys.argv[1] == 'speeds':
-        save_speeds_cloud()
+    save_images_cloud()
+    save_speeds_cloud()
