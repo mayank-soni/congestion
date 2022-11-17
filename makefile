@@ -3,3 +3,6 @@ save_local:
 
 save_cloud:
 	python -c 'from congestion.data.save_cloud import save_cloud; save_cloud()'
+
+save_cloud_vm:
+	/home/mayank-soni/.pyenv/shims/python -c 'from congestion.data.save_cloud import save_cloud; save_cloud()'
