@@ -1,11 +1,10 @@
 import pandas as pd
 import os
 from google.cloud import bigquery
-from congestion.data.params import (PROJECT, DATASET, BUCKET_NAME,
-                                    LOCAL_DATA_PATH, MACHINE, VM_DATA_PATH)
+from congestion.data.params import (PROJECT, DATASET, BUCKET_NAME)
 from congestion.data.get_data import get_images, get_speeds
 from google.cloud import storage
-from congestion.data.save_local import save_images_local
+from congestion.data.save_local import save_images_local, get_image_path
 
 
 def save_cloud():
@@ -30,19 +29,12 @@ def save_images_cloud(images: dict, verbose: bool = False):
         if verbose:
             print(f'Saving image {i}')
         cloud_filename = f"data-images/{filename}"
-        if MACHINE == 'local':
-            machine_filename = os.path.join(LOCAL_DATA_PATH, 'data-images', filename)
-        elif MACHINE == 'vm':
-            machine_filename = os.path.join(VM_DATA_PATH, 'data-images', filename)
-        else:
-            raise ValueError(f'Value of $MACHINE, {MACHINE = }, not recognised')
+        machine_filename = os.path.join(get_image_path(), filename)
         blob = bucket.blob(cloud_filename)
         blob.upload_from_filename(machine_filename)
         # Delete local data after uploading to cloud
         if os.path.exists(machine_filename):
             os.remove(machine_filename)
-        if i == 1:
-            break
 
 
 def save_speeds_cloud(speedsdf: pd.DataFrame):

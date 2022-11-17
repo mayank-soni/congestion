@@ -25,8 +25,6 @@ def get_images(verbose: bool = False) -> dict:
         response = requests.get(imageurl)
         # Save to dictionary
         images_dict[filename] = response.content
-        if i == 1:
-            break
     return images_dict
 
 

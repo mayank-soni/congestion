@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from congestion.data.params import LOCAL_DATA_PATH
+from congestion.data.params import LOCAL_DATA_PATH, MACHINE, VM_DATA_PATH
 from congestion.data.get_data import get_images, get_speeds
 
 def save_local():
@@ -21,8 +21,8 @@ def save_images_local(images: dict, verbose: bool = False):
     for i, (filename, data) in enumerate(images.items()):
         if verbose:
             print(f'Saving image {i}')
-        full_filename = os.path.join(LOCAL_DATA_PATH, 'data-images', filename)
-        with open(full_filename, 'wb') as f:
+        machine_filename = os.path.join(get_image_path(), filename)
+        with open(machine_filename, 'wb') as f:
             f.write(data)
 
 
@@ -37,6 +37,19 @@ def save_speeds_local(speeds_data: pd.DataFrame):
         speeds_data.to_csv(filename, mode = 'a', header = False)
     else:
         speeds_data.to_csv(filename, mode = 'a', header = True)
+
+
+def get_image_path() -> str:
+    '''
+    Returns correct path to local folder for saving images, depending on MACHINE.
+    '''
+    if MACHINE == 'local':
+        machine_image_folder = os.path.join(LOCAL_DATA_PATH, 'data-images')
+    elif MACHINE == 'vm':
+        machine_image_folder = os.path.join(VM_DATA_PATH, 'data-images')
+    else:
+        raise ValueError(f'Value of $MACHINE, {MACHINE = }, not recognised')
+    return machine_image_folder
 
 
 if __name__ == '__main__':
