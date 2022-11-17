@@ -5,6 +5,10 @@ LOCAL_DATA_PATH = os.path.expanduser(os.environ["LOCAL_DATA_PATH"])
 
 PROJECT = os.environ["PROJECT"]
 DATASET = os.environ["SPEEDS_DATASET"]
+BUCKET_NAME = os.environ["BUCKET_NAME"]
+VM_DATA_PATH = os.environ['VM_DATA_PATH']
+MACHINE = os.environ['MACHINE']
+
 
 # TODO: Validations
 # ################## VALIDATIONS #################

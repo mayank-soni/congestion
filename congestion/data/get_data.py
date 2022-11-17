@@ -25,6 +25,8 @@ def get_images(verbose: bool = False) -> dict:
         response = requests.get(imageurl)
         # Save to dictionary
         images_dict[filename] = response.content
+        if i == 1:
+            break
     return images_dict
 
 
@@ -33,25 +35,25 @@ def get_speeds(verbose: bool = False) -> pd.DataFrame:
     Gets responses from LTA speeds API and saves to DataFrame
     '''
     print('Downloading speeds data')
+
+    # 59006 rows in API response, obtained in chunks of 500.
+    # Get all chunks and store in list
+    speedsdata = []
+    for skip in range(0, 59500, 500):
+        speedsdata.append(get_speed_chunk(skip = skip))
+    # Combine chunks and return
+    return pd.concat(speedsdata)
+
+def get_speed_chunk(skip: int = 0, verbose: bool = False) -> pd.DataFrame:
     url_speeds = 'http://datamall2.mytransport.sg/ltaodataservice/TrafficSpeedBandsv2'
     # Get current time to timestamp the data
-    current_time = datetime.now(tz = timezone(timedelta(hours=8))).strftime('%Y-%m-%d_%H%M')
-    # 59006 rows in API response, obtained in chunks of 500.
-    # Get first chunk of 500, convert to df, and initialise list of dataframes
+    current_time = datetime.now(tz = timezone(timedelta(hours=8)))
     if verbose:
-        print('Downloading speeds row no. 0 - 499')
-    speeds = requests.get(url_speeds, headers = LTA_API_HEADERS).json()
-    speeds_df = pd.DataFrame(speeds['value']).set_index('LinkID')
-    # Add a column for current time, since dataframe has no timestamp
+        print(f'Downloading speeds row no. {skip} - {skip+499}')
+    speeds = requests.get(url_speeds, headers = LTA_API_HEADERS, params = {'$skip': f'{skip}'}).json()
+    speeds_df = pd.DataFrame(speeds['value'])
+    # Add new timestamp column to timestamp data
     speeds_df['Time'] = current_time
-    speedsdata = [speeds_df]
-    # Get remaining chunks of 500, convert to dfs, and append to list
-    for skip in range(500, 59500, 500):
-        if verbose:
-            print(f'Downloading speeds row no. {skip} - {skip+499}')
-        new_speeds = requests.get(url_speeds, headers = LTA_API_HEADERS, params = {'$skip': f'{skip}'}).json()
-        speeds_df = pd.DataFrame(new_speeds['value']).set_index('LinkID')
-        speeds_df['Time'] = current_time
-        speedsdata.append(speeds_df)
-    # Combine all chunks and return, together with current time
-    return pd.concat(speedsdata)
+    # Edit column data types
+    speeds_df.loc[:,['MinimumSpeed', 'MaximumSpeed']] = speeds_df[['MinimumSpeed', 'MaximumSpeed']].apply(pd.to_numeric)
+    return speeds_df
