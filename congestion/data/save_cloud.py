@@ -1,5 +1,5 @@
-import pandas as pd
 import os
+import sys
 from google.cloud import bigquery
 from congestion.data.params import (PROJECT, DATASET, BUCKET_NAME)
 from congestion.data.get_data import get_images, get_speeds
@@ -7,20 +7,11 @@ from google.cloud import storage
 from congestion.data.save_local import save_images_local, get_image_path
 
 
-def save_cloud():
-    '''
-    Wrapper function, downloading image and speed data and saving on cloud
-    '''
-    images = get_images()
-    save_images_cloud(images)
-    speedsdf = get_speeds()
-    save_speeds_cloud(speedsdf)
-
-
-def save_images_cloud(images: dict, verbose: bool = False):
+def save_images_cloud(verbose: bool = False):
     '''
     Saves images to cloud.
     '''
+    images = get_images()
     # Save images locally first
     save_images_local(images)
     # Then transfer to cloud
@@ -39,10 +30,11 @@ def save_images_cloud(images: dict, verbose: bool = False):
             os.remove(machine_filename)
 
 
-def save_speeds_cloud(speedsdf: pd.DataFrame):
+def save_speeds_cloud():
     '''
     Saves speeds dataframe to cloud
     '''
+    speedsdf = get_speeds()
     print('Saving speeds df to BigQuery')
     table = f"{PROJECT}.{DATASET}.speedsdata"
     client = bigquery.Client()
@@ -51,4 +43,7 @@ def save_speeds_cloud(speedsdf: pd.DataFrame):
 
 
 if __name__ == '__main__':
-    save_cloud()
+    if sys.argv[1] == 'images':
+        save_images_cloud()
+    if sys.argv[1] == 'speeds':
+        save_speeds_cloud()
