@@ -36,8 +36,51 @@ def get_speeds(verbose: bool = False) -> pd.DataFrame:
 
     # 59006 rows in API response, obtained in chunks of 500.
     # Get all chunks and store in list
+    skipset = {4000, 5000, 6000, 8500,
+ 14500,
+ 16500,
+ 17000,
+ 18500,
+ 19000,
+ 19500,
+ 22000,
+ 22500,
+ 23000,
+ 23500,
+ 25000,
+ 25500,
+ 26000,
+ 26500,
+ 27000,
+ 27500,
+ 30500,
+ 32000,
+ 34500,
+ 38000,
+ 40000,
+ 41000,
+ 41500,
+ 42000,
+ 42500,
+ 43000,
+ 44000,
+ 46000,
+ 46500,
+ 47500,
+ 49000,
+ 49500,
+ 50000,
+ 52000,
+ 53000,
+ 54000,
+ 54500,
+ 55500,
+ 56500,
+ 57000,
+ 57500,
+ 58000}
     speedsdata = []
-    for skip in range(0, 59500, 500):
+    for skip in skipset:
         speedsdata.append(get_speed_chunk(skip = skip))
     # Combine chunks and return
     return pd.concat(speedsdata)
