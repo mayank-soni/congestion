@@ -21,7 +21,9 @@ def save_images_cloud(images: dict, verbose: bool = False):
     '''
     Saves images to cloud.
     '''
+    # Save images locally first
     save_images_local(images)
+    # Then transfer to cloud
     print('Saving images to cloud')
     client = storage.Client()
     bucket = client.bucket(BUCKET_NAME)
